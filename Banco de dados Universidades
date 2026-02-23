@@ -1,0 +1,77 @@
+CREATE DATABASE IF NOT EXISTS notas_corte_universidades;
+USE notas_corte_universidades
+CREATE TABLE universidades(
+   idUniversity INT AUTO_INCREMENT PRIMARY KEY,
+    Lname VARCHAR(100) NOT NULL,
+    sigla VARCHAR(10),
+    state CHAR(2),
+    statuni enum('Federal','Privada') 
+);
+DESC universidades;
+
+CREATE TABLE cursos (
+    idCourse INT AUTO_INCREMENT PRIMARY KEY,
+    Lname VARCHAR(50) NOT NULL,
+    cursoType ENUM('Bacharelado', 'Licenciatura', 'Tecnólogo') DEFAULT 'Bacharelado'
+);
+DESC cursos;
+
+CREATE TABLE  nota_corte (
+    idCutOff INT AUTO_INCREMENT PRIMARY KEY,
+    idUniversity INT,
+    idCourse INT,
+    year INT NOT NULL,
+    score_ampla FLOAT NOT NULL,
+    score_cotas FLOAT,
+    period ENUM('1º Semestre', '2º Semestre') DEFAULT '1º Semestre',
+    CONSTRAINT fk_university FOREIGN KEY (idUniversity) REFERENCES university(idUniversity),
+    CONSTRAINT fk_course FOREIGN KEY (idCourse) REFERENCES course(idCourse)
+);
+DESC nota_corte;
+
+#Inserindo universidades 
+INSERT INTO universidades (Lname, sigla, state) VALUES 
+('Universidade Federal Fluminense', 'UFF', 'RJ'),
+('Universidade Federal do Rio de Janeiro', 'UFRJ', 'RJ'),
+('Universidade Federal do Estado do Rio de Janeiro', 'UNIRIO', 'RJ');
+
+#Nome dos cursos 
+INSERT INTO cursos (name) VALUES 
+('Sistemas de Informação'),
+('Ciência de Dados'),
+('Estatística');
+
+#notas de corte das universidades 
+#ordem Sistema da informação,Ciência de dados,Estatística 
+#UFF
+INSERT INTO notas_corte (idUniversity, idCourse, year, score_ampla, score_cotas) VALUES 
+(1, 1, 2024, 780.5, 710.2), -- UFF, SI
+(1, 2, 2024, 815.0, 750.0), -- UFF, CD
+(1, 3, 2024, 740.0, 680.5); #
+
+#UFRJ: 
+INSERT INTO cut_off_points (idUniversity, idCourse, year, score_ampla, score_cotas) VALUES 
+(2, 1, 2024, 765.0, 690.0), 
+(2, 2, 2024, 802.3, 740.1),
+(2, 3, 2024, 720.5, 660.0);
+
+#UNIRIO
+INSERT INTO cut_off_points (idUniversity, idCourse, year, score_ampla, score_cotas) VALUES 
+(3, 1, 2024, 772.1, 705.5),
+(3, 2, 2024, 798.0, 735.0),
+(3, 3, 2024, 735.2, 675.0);
+
+#1.  Qual ranking de faculdades por nota de corte (Estatística) 
+SELECT u.sigla, c.name, cp.score_ampla
+FROM university u
+JOIN cut_off_points cp ON u.idUniversity = cp.idUniversity
+JOIN course c ON cp.idCourse = c.idCourse
+WHERE c.name = 'Estatística'
+ORDER BY cp.score_ampla DESC;
+
+#2. Qual a Diferença entre nota Ampla e Cotas e curso tem a maior "barreira" entre modalidades?
+SELECT u.sigla, c.name, 
+       (cp.score_ampla - cp.score_cotas) AS Diferenca_Pontos
+FROM cut_off_points cp
+JOIN university u ON cp.idUniversity = u.idUniversity
+JOIN course c ON cp.idCourse = c.idCourse;
