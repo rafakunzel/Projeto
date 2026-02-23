@@ -1,0 +1,162 @@
+Banco de dados SQL
+# Criação do banco de dados para o cenário de E-commerce
+CREATE DATABASE IF NOT EXISTS ecommerce;
+USE ecommerce;
+# Tabela Cliente
+CREATE TABLE clients(
+    idClient int auto_increment primary key,
+    fname varchar(10),
+    minit char(3),
+    lname varchar(20),
+    cpf char(11) not null,
+    address varchar(30),
+    constraint unique_cpf_client unique (cpf)
+);
+DESC clients;
+
+# Tabela Produto
+CREATE TABLE product(
+    idProduct int auto_increment primary key,
+    pname varchar(50) not null,
+    category varchar(20),
+    avaliação float default 0,
+    size varchar(10) -- Dimensão do produto
+);
+DESC product;
+
+# Tabela Pedido
+CREATE TABLE orders(
+    idOrder int auto_increment primary key,
+    idOrderClient int,
+    orderStatus enum('Cancelado', 'Confirmado', 'Em processamento') default 'Em processamento',
+    orderDescription varchar(255),
+    sendValue float default 10,
+    paymentCash bool default false,
+    constraint fk_orders_client foreign key (idOrderClient) references clients(idClient)
+);
+DESC orders;
+
+# Tabela Estoque
+CREATE TABLE productStorage(
+    idProdStorage int auto_increment primary key,
+    storageLocation varchar(255),
+    quantity int default 0
+);
+DESC productStorage;
+
+# Tabela Fornecedor
+CREATE TABLE supplier(
+    idSupplier int auto_increment primary key,
+    socialName varchar(255) not null,
+    cnpj char(14) not null,
+    contact char(11) not null,
+    constraint unique_supplier unique (cnpj)
+);
+DESC supplier;
+
+# Tabela Vendedor (Terceiro)
+CREATE TABLE seller(
+    idSeller int auto_increment primary key,
+    socialName varchar(255) not null,
+    abstName varchar(255),
+    cnpj char(14),
+    cpf char(11),
+    location varchar(255),
+    contact char(11) not null,
+    constraint unique_cnpj_seller unique (cnpj),
+    constraint unique_cpf_seller unique (cpf)
+);
+DESC seller;
+
+# Tabela de Relacionamento: Produtos por Vendedor
+CREATE TABLE productSeller(
+    idPseller int,
+    idProduct int,
+    prodQuantity int default 1,
+    primary key (idPseller, idProduct),
+    constraint fk_product_seller foreign key (idPseller) references seller (idSeller),
+    constraint fk_product_product_seller foreign key (idProduct) references product (idProduct)
+);
+DESC productSeller;
+
+# Tabela de Relacionamento: Produto/Pedido
+CREATE TABLE productOrder(
+    idPOproduct int,
+    idPOorder int,
+    poQuantity int default 1,
+    poStatus enum('Disponível', 'Sem estoque') default 'Disponível',
+    primary key (idPOproduct, idPOorder),
+    constraint fk_productorder_product foreign key (idPOproduct) references product(idProduct),
+    constraint fk_productorder_order foreign key (idPOorder) references orders(idOrder)
+);
+DESC productOrder;
+
+# Tabela de Relacionamento: Localização no Estoque
+CREATE TABLE storageLocation(
+    idLproduct int,
+    idLstorage int,
+    location varchar(255) not null,
+    primary key (idLproduct, idLstorage),
+    constraint fk_storage_location_product foreign key (idLproduct) references product(idProduct),
+    constraint fk_storage_location_storage foreign key (idLstorage) references productStorage(idProdStorage)
+);
+DESC storageLocation;
+
+# Tabela de Relacionamento: Produto por Fornecedor
+CREATE TABLE productSupplier(
+    idPsSupplier int,
+    idPsProduct int,
+    quantity int not null,
+    primary key (idPsSupplier, idPsProduct),
+    constraint fk_product_supplier_supplier foreign key (idPsSupplier) references supplier(idSupplier),
+    constraint fk_product_supplier_product foreign key (idPsProduct) references product(idProduct)
+);
+DESC productSupplier;
+# Lista final de todas as tabelas criadas no banco
+SHOW TABLES;
+#inserindo clientes 
+INSERT INTO clients (fname, lname, address, clientType) VALUES 
+('Carlos', 'Silva', 'Rua 1, Centro', 'PF'),
+('TechMundo', 'S.A', 'Av Industrial, 500', 'PJ');
+INSERT INTO clientPF (idClient, cpf) VALUES (1, '12345678901');
+INSERT INTO clientPJ (idClient, cnpj, socialName) VALUES (2, '98765432000100', 'TechMundo LTDA');
+
+#inserindo produtos 
+INSERT INTO product (pname, category, avaliação) VALUES
+('Notebook Gamer', 'Eletrônico', 4.9),
+('Teclado Mecânico', 'Eletrônico', 4.5),
+('Mousepad XL', 'Acessórios', 4.0);
+
+#Fornecedor
+INSERT INTO supplier (socialName, cnpj) VALUES ('Distribuidora Global', '11222333000199');
+
+#Pedidos:
+INSERT INTO orders (idOrderClient, orderStatus, sendValue, trackingCode, deliveryStatus) VALUES
+(1, 'Confirmado', 20.0, 'TRK123BR', 'Em trânsito'),
+(2, 'Confirmado', 50.0, 'TRK456BR', 'Postado');
+
+#Associação Produtos e Pedidos
+INSERT INTO productOrder (idPOproduct, idPOorder, poQuantity) VALUES (1, 1, 1), (2, 1, 1), (1, 2, 10);
+
+#Perguntas 
+#1: Quantos pedidos foram feitos por cada cliente?
+SELECT c.fname, COUNT(o.idOrder) AS total_pedidos
+FROM clients c
+LEFT JOIN orders o ON c.idClient = o.idOrderClient
+GROUP BY c.idClient;
+
+#2: Lista de pedidos com valor total estimado ?
+SELECT 
+    o.idOrder, 
+    o.trackingCode,
+    (o.sendValue + (po.poQuantity * 500)) AS total_estimado_pedido
+FROM orders o
+JOIN productOrder po ON o.idOrder = po.idPOorder
+ORDER BY total_estimado_pedido DESC;
+
+#3: Como recuperar status de entrega de produtos de clientes PJ ?
+SELECT pj.socialName, o.deliveryStatus, o.trackingCode
+FROM clientPJ pj
+JOIN clients c ON pj.idClient = c.idClient
+JOIN orders o ON c.idClient = o.idOrderClient
+WHERE o.deliveryStatus <> 'Entregue';
