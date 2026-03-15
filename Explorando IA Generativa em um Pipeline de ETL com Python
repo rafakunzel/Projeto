@@ -1,0 +1,15 @@
+import pandas as pd
+#Dados fictícios 
+data = {
+    'Nome': ['Alice', 'Bruno', 'Carla', 'Diego'],
+    'Faculdade': ['USP', 'UFMG', 'UFRJ', 'Unicamp'],
+    'Curso_Atual': ['Estatística', 'Matemática', 'Ciência de Dados', 'Engenharia'],
+    'Interesse': ['Machine Learning', 'Big Data', 'IA Generativa', 'Análise de Dados']
+}
+# Salvando em CSV 
+df_origem = pd.DataFrame(data)
+df_origem.to_csv('estudantes_dados.csv', index=False)
+# Extração
+df = pd.read_csv('estudantes_dados.csv')
+print("Dados Extraídos:")
+print(df.head())
