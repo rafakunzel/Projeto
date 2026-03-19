@@ -1,3 +1,1 @@
-# Projeto
-Atividade dos Cursos da DIO.ME
-()
+Minhas atividades de cursos da Dio.me, envolvem: Power BI, Excel,SQL,Python 
