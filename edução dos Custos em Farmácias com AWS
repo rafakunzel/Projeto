@@ -1,0 +1,47 @@
+#Relatório de implemntação de Serviços da AWS
+Data:19/03/2026
+Empresa:Abstergo Industries
+Responsável: Rafael Fernandes Kunzel Candido 
+
+#Introdução 
+Esta relatório apresenta o processo de implementação de ferramentas 
+na empresa:Abstergo Industries, realizado por:Rafael Fernandes Kunzel Candido.
+O objetivo do projeto foi elencar 3 serviços AWS, com a finalidade de
+realizar a diminuição de custos imediatos. 
+
+#Descrição do Projeto 
+O projeto de implemnentação de ferramentas foi divido
+em 3 etapas, cada uma com seus objetivos específico.A
+seguir,serão descritos as etapas do projeto: 
+
+Etapa1:
+Ferramenta:Trusted Advisor
+Foco: Otimização de custos e segurança
+Descrição de uso: Com esse ferramento podemos varrer  a conta e monstrar extamente quais
+isntânciass EC2 estão com uso de CPU abaixo de 10%, para olhar e deletar o que está
+gerndo um gasto inútil. 
+
+Etapa2:
+Ferramenta:Cost Explorer
+Foco:Visualização e Previsão.
+Descrição de uso:Ela permiti identificar gastos inesperados,por meio dela podemos filtrar 
+os serviços ou tags e descobrir se alguns deles subiu drasticamente, permitindo um ajuste
+e arquitetura antes do fim de mês. 
+
+Etapa3:
+Ferramenta:S3 Intelligent-Tiering
+Foco:Armazenamento inteligente.
+Descrição de uso:Permite vizualizar quais arquivos no S3 são acessados com frequnência
+e move automaticamente os arquivos não ulizados para camadas mais baratas, sem precisar
+gerenciar nada ou correr o risco de pagar taxas de recuperação caras. 
+
+Conclusão: 
+Etapa 1:Mostra a visibilidade para onde o dinheiro está indo,um extrato bancário operacional
+detalhado, permitindo identificar as tendências de picos e gastos. 
+
+Etapa 2:Responsável pela higienização age como um consultor de auditoria,aponta o
+desperdício que existe no disco rígido(EBS), um servidor apagado que está gerando gasto 
+ou máquina ligada que não processa nada. 
+
+Etapa 3:Automação garante que não ocorra gastos de armazanamento desnecessário com dados que 
+ficam esqucidos,ajundando-se sozinho conforme a empresa cresce ou muda. 
